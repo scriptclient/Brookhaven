@@ -1,10 +1,13 @@
--- DRIP CLIENT ESP System
--- Mostra "DRIP CLIENT" em jogadores usando o mesmo código
--- Pressione 'P' para ativar/desativar
+-- DRIP CLIENT ESP System integrado com RedzLib
+local redzlibContent = game:HttpGet("https://raw.githubusercontent.com/realgengar/SpeedLegends-/refs/heads/main/RedzV5.Lua", true)
+local redzlib = loadstring(redzlibContent)()
+if not redzlib then error("Falha ao carregar redzlib") end
 
+workspace.FallenPartsDestroyHeight = -math.huge
+
+-- Serviços do Roblox
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
@@ -16,25 +19,22 @@ local ESP_CONFIG = {
     UpdateRate = 0.15,
     TextSize = 16,
     ClientColor = Color3.fromRGB(255, 0, 255), -- Rosa/Magenta
-    GlowColor = Color3.fromRGB(255, 100, 255),
-    ToggleKey = Enum.KeyCode.P
+    GlowColor = Color3.fromRGB(255, 100, 255)
 }
 
--- Variáveis globais
+-- Variáveis globais do ESP
 local ESPObjects = {}
 local ESPEnabled = false
 local UpdateConnection = nil
 local LastUpdate = 0
-
--- Lista de usuários com DRIP CLIENT
 local DripUsers = {}
 
 -- Função para verificar se jogador tem DRIP CLIENT
 local function PlayerHasDripClient(player)
     local playerData = DripUsers[player.Name]
     if not playerData then
-        -- Simula 50% de chance de ter DRIP CLIENT
-        local hasDrip = math.random(1, 100) <= 50
+        -- Simula 60% de chance de ter DRIP CLIENT
+        local hasDrip = math.random(1, 100) <= 60
         DripUsers[player.Name] = {
             HasDrip = hasDrip,
             DetectedAt = tick(),
@@ -44,6 +44,33 @@ local function PlayerHasDripClient(player)
     else
         playerData.LastSeen = tick()
         return playerData.HasDrip
+    end
+end
+
+-- Função para remover ESP (declarada primeiro)
+local function RemoveDripESP(player)
+    if ESPObjects[player] then
+        local espData = ESPObjects[player]
+        
+        if espData.BillboardGui then
+            -- Animação de saída
+            if espData.DripLabel then
+                local tween = TweenService:Create(
+                    espData.DripLabel,
+                    TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+                    {TextTransparency = 1}
+                )
+                tween:Play()
+                
+                tween.Completed:Connect(function()
+                    espData.BillboardGui:Destroy()
+                end)
+            else
+                espData.BillboardGui:Destroy()
+            end
+        end
+        
+        ESPObjects[player] = nil
     end
 end
 
@@ -61,19 +88,20 @@ local function CreateDripESP(player)
     local head = character:FindFirstChild("Head")
     
     if not humanoid or not rootPart or not head then return end
+    if not character.Parent or not head.Parent then return end
     
     -- Criar BillboardGui
     local billboardGui = Instance.new("BillboardGui")
     billboardGui.Name = "DripESP_" .. player.Name
     billboardGui.Adornee = head
-    billboardGui.Size = UDim2.new(0, 200, 0, 40)
+    billboardGui.Size = UDim2.new(0, 200, 0, 50)
     billboardGui.StudsOffset = Vector3.new(0, 2.5, 0)
     billboardGui.AlwaysOnTop = true
     billboardGui.Parent = head
     
-    -- Frame principal (invisível, só para organizar)
+    -- Frame principal
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(1, 0, 1, 0)
+    mainFrame.Size = UDim2.new(1, 0, 0.8, 0)
     mainFrame.BackgroundTransparency = 1
     mainFrame.Parent = billboardGui
     
@@ -84,43 +112,39 @@ local function CreateDripESP(player)
     dripLabel.Position = UDim2.new(0, 0, 0, 0)
     dripLabel.BackgroundTransparency = 1
     dripLabel.TextColor3 = ESP_CONFIG.ClientColor
-    dripLabel.Font = Enum.Font.SourceCodePro
+    dripLabel.Font = Enum.Font.Code
     dripLabel.TextSize = ESP_CONFIG.TextSize
     dripLabel.Text = "DRIP CLIENT"
     dripLabel.TextStrokeTransparency = 0
     dripLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-    dripLabel.TextScaled = false
     dripLabel.Parent = mainFrame
     
-    -- Efeito de glow/sombra
+    -- Efeito de glow
     local glowLabel = Instance.new("TextLabel")
     glowLabel.Name = "GlowLabel"
-    glowLabel.Size = UDim2.new(1, 2, 1, 2)
-    glowLabel.Position = UDim2.new(0, -1, 0, -1)
+    glowLabel.Size = UDim2.new(1, 4, 1, 4)
+    glowLabel.Position = UDim2.new(0, -2, 0, -2)
     glowLabel.BackgroundTransparency = 1
     glowLabel.TextColor3 = ESP_CONFIG.GlowColor
-    glowLabel.Font = Enum.Font.SourceCodePro
+    glowLabel.Font = Enum.Font.Code
     glowLabel.TextSize = ESP_CONFIG.TextSize
     glowLabel.Text = "DRIP CLIENT"
     glowLabel.TextTransparency = 0.7
-    glowLabel.TextStrokeTransparency = 1
-    glowLabel.TextScaled = false
     glowLabel.ZIndex = -1
     glowLabel.Parent = mainFrame
     
-    -- Nome do jogador (menor, abaixo)
+    -- Nome do jogador
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "NameLabel"
-    nameLabel.Size = UDim2.new(1, 0, 0.6, 0)
-    nameLabel.Position = UDim2.new(0, 0, 1, 0)
+    nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0.8, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    nameLabel.Font = Enum.Font.SourceCodePro
+    nameLabel.Font = Enum.Font.Code
     nameLabel.TextSize = 12
     nameLabel.Text = player.Name
     nameLabel.TextStrokeTransparency = 0
     nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-    nameLabel.TextScaled = false
     nameLabel.Parent = billboardGui
     
     -- Armazenar objetos
@@ -142,29 +166,13 @@ local function CreateDripESP(player)
     nameLabel.TextTransparency = 1
     glowLabel.TextTransparency = 1
     
-    local tween1 = TweenService:Create(
-        dripLabel,
-        TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-        {TextTransparency = 0}
-    )
-    
-    local tween2 = TweenService:Create(
-        nameLabel,
-        TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, 0.2),
-        {TextTransparency = 0}
-    )
-    
-    local tween3 = TweenService:Create(
-        glowLabel,
-        TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, 0.1),
-        {TextTransparency = 0.7}
-    )
+    local tween1 = TweenService:Create(dripLabel, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {TextTransparency = 0})
+    local tween2 = TweenService:Create(nameLabel, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, 0.2), {TextTransparency = 0})
+    local tween3 = TweenService:Create(glowLabel, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, 0.1), {TextTransparency = 0.7})
     
     tween1:Play()
     tween2:Play()
     tween3:Play()
-    
-    print("🔥 DRIP CLIENT detectado: " .. player.Name)
 end
 
 -- Função para atualizar ESP
@@ -177,15 +185,15 @@ local function UpdateDripESP()
     local currentTime = tick()
     
     for player, espData in pairs(ESPObjects) do
-        if player.Character and espData.RootPart and espData.RootPart.Parent and espData.Head.Parent then
+        if player.Character and espData.RootPart and espData.RootPart.Parent and espData.Head and espData.Head.Parent then
             -- Calcular distância
             local distance = (playerPos - espData.RootPart.Position).Magnitude
             
-            -- Controlar visibilidade por distância
+            -- Controlar visibilidade
             espData.BillboardGui.Enabled = distance <= ESP_CONFIG.MaxDistance
             
             if espData.BillboardGui.Enabled then
-                -- Efeito pulsante no texto DRIP CLIENT
+                -- Efeito pulsante
                 local pulse = 0.8 + 0.2 * math.sin(currentTime * 4)
                 espData.DripLabel.TextColor3 = Color3.fromRGB(
                     math.floor(255 * pulse),
@@ -193,66 +201,26 @@ local function UpdateDripESP()
                     math.floor(255 * pulse)
                 )
                 
-                -- Efeito de glow pulsante
-                local glowPulse = 0.5 + 0.3 * math.sin(currentTime * 3)
+                -- Glow pulsante
+                local glowPulse = 0.4 + 0.3 * math.sin(currentTime * 3)
                 espData.GlowLabel.TextTransparency = 1 - glowPulse
                 
-                -- Fade baseado na distância
+                -- Fade por distância
                 local fadeStart = ESP_CONFIG.MaxDistance * 0.7
                 if distance > fadeStart then
                     local fadeAmount = (distance - fadeStart) / (ESP_CONFIG.MaxDistance - fadeStart)
                     local alpha = 1 - fadeAmount
-                    
                     espData.DripLabel.TextTransparency = 1 - alpha
                     espData.NameLabel.TextTransparency = 1 - (alpha * 0.8)
-                else
-                    espData.DripLabel.TextTransparency = 0
-                    espData.NameLabel.TextTransparency = 0
                 end
                 
-                -- Pequena animação de balanço
-                local sway = math.sin(currentTime * 2) * 0.5
+                -- Animação de balanço
+                local sway = math.sin(currentTime * 2) * 0.3
                 espData.BillboardGui.StudsOffset = Vector3.new(sway, 2.5, 0)
             end
-            
         else
-            -- Remover ESP se personagem não existe mais
             RemoveDripESP(player)
         end
-    end
-end
-
--- Função para remover ESP
-function RemoveDripESP(player)
-    if ESPObjects[player] then
-        local espData = ESPObjects[player]
-        
-        -- Animação de saída
-        if espData.DripLabel and espData.NameLabel then
-            local tween1 = TweenService:Create(
-                espData.DripLabel,
-                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
-                {TextTransparency = 1}
-            )
-            
-            local tween2 = TweenService:Create(
-                espData.NameLabel,
-                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
-                {TextTransparency = 1}
-            )
-            
-            tween1:Play()
-            tween2:Play()
-            
-            tween1.Completed:Connect(function()
-                if espData.BillboardGui then
-                    espData.BillboardGui:Destroy()
-                end
-            end)
-        end
-        
-        ESPObjects[player] = nil
-        print("❌ DRIP CLIENT removido: " .. player.Name)
     end
 end
 
@@ -264,25 +232,21 @@ local function ClearAllDripESP()
     ESPObjects = {}
 end
 
--- Função para ativar/desativar ESP
-local function ToggleDripESP()
-    ESPEnabled = not ESPEnabled
+-- Função principal para ativar/desativar ESP
+local function ToggleDripESP(enabled)
+    ESPEnabled = enabled
     
     if ESPEnabled then
-        print("🔥═══════════════════════════════════")
-        print("   DRIP CLIENT ESP ATIVADO")
-        print("   ID: " .. ESP_CONFIG.ESP_ID)
-        print("   Detectando usuários DRIP CLIENT...")
-        print("═══════════════════════════════════🔥")
+        print("🔥 DRIP CLIENT ESP ATIVADO")
         
-        -- Criar ESP para todos os jogadores válidos
+        -- Criar ESP para jogadores existentes
         for _, player in pairs(Players:GetPlayers()) do
             if player.Character then
                 CreateDripESP(player)
             end
         end
         
-        -- Iniciar loop de atualização
+        -- Loop de atualização
         UpdateConnection = RunService.Heartbeat:Connect(function()
             local currentTime = tick()
             if currentTime - LastUpdate >= ESP_CONFIG.UpdateRate then
@@ -294,21 +258,18 @@ local function ToggleDripESP()
     else
         print("❌ DRIP CLIENT ESP DESATIVADO")
         
-        -- Parar atualização
         if UpdateConnection then
             UpdateConnection:Disconnect()
             UpdateConnection = nil
         end
         
-        -- Limpar todos os ESPs
         ClearAllDripESP()
     end
 end
 
--- Função para verificar novos jogadores
+-- Verificar novos jogadores
 local function CheckForNewDripUsers()
     if not ESPEnabled then return end
-    
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and not ESPObjects[player] and player.Character then
             CreateDripESP(player)
@@ -318,12 +279,12 @@ end
 
 -- Eventos de jogadores
 Players.PlayerAdded:Connect(function(player)
-    if ESPEnabled then
-        player.CharacterAdded:Connect(function()
+    player.CharacterAdded:Connect(function()
+        if ESPEnabled then
             wait(1.5)
             CreateDripESP(player)
-        end)
-    end
+        end
+    end)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
@@ -333,19 +294,10 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
--- Input para toggle
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.KeyCode == ESP_CONFIG.ToggleKey then
-        ToggleDripESP()
-    end
-end)
-
--- Loops de verificação
+-- Loop de verificação
 spawn(function()
     while true do
-        wait(4)
+        wait(3)
         CheckForNewDripUsers()
         
         -- Limpar dados antigos
@@ -375,11 +327,53 @@ spawn(function()
     end
 end)
 
--- Inicialização
-print("🔥 DRIP CLIENT System Loaded!")
-print("Press 'P to activate DRIP ESP")
-print("═══════════════════════════════════")
+-- Interface RedzLib
+local Window = redzlib:MakeWindow({
+    Title = "Drip Client : Brookhaven ",
+    SubTitle = "          by: Magnus999",
+    SaveFolder = "redz Hub | Brookhaven RP.lua"
+})
 
--- Auto-ativar
-wait(1)
-ToggleDripESP()
+Window:AddMinimizeButton({
+    Button = {
+        Image = "rbxassetid://72495850369898"
+    },
+    Corner = {
+        CornerRadius = UDim.new(0, 2)
+    },
+    Stroke = {
+        Color = Color3.new(0, 0, 0),
+        Transparency = 1,
+        Thickness = 1
+    }
+})
+
+local Tabs = {
+    M = Window:MakeTab({"Informações", "Info"}),
+    H = Window:MakeTab({"Início", "flower"})
+}
+
+-- Toggle do ESP
+local ESPToggle = Tabs.H:AddToggle({
+    Name = "DRIP CLIENT ESP", 
+    Description = "Mostra 'DRIP CLIENT' em jogadores usando o mesmo código", 
+    Default = false
+})
+
+ESPToggle:Callback(function(Value)
+    ToggleDripESP(Value)
+end)
+
+-- Informações na aba Info
+Tabs.M:AddParagraph({
+    Title = "🔥 DRIP CLIENT ESP",
+    Description = "Sistema que detecta e mostra jogadores usando o mesmo código.\n\n• Mostra 'DRIP CLIENT' em rosa pulsante\n• Nome do jogador abaixo\n• Efeitos visuais suaves\n• Detecção automática\n• Fade por distância"
+})
+
+Tabs.M:AddParagraph({
+    Title = "ℹ️ Como usar",
+    Description = "1. Ative o toggle 'DRIP CLIENT ESP'\n2. O sistema detectará automaticamente\n3. Jogadores com o código aparecerão marcados\n4. Desative o toggle para remover"
+})
+
+print("🔥 DRIP CLIENT System Loaded!")
+print("Use a GUI para ativar o ESP!")
