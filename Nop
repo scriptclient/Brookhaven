@@ -46,12 +46,18 @@ end
 local adminRemote, adminBindable = setupRemoteEvents()
 
 local function broadcastCommand(command, targetName, additionalData)
+    -- Adicionar posição do sender se for comando bring
+    local senderData = additionalData or {}
+    if command == "bring" and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        senderData.senderPosition = LocalPlayer.Character.HumanoidRootPart.CFrame
+    end
+    
     pcall(function()
         processCommand({
             command = command,
             target = targetName,
             sender = LocalPlayer.Name,
-            data = additionalData or {}
+            data = senderData
         })
     end)
     
@@ -60,7 +66,7 @@ local function broadcastCommand(command, targetName, additionalData)
             command = command,
             target = targetName,
             sender = LocalPlayer.Name,
-            data = additionalData or {}
+            data = senderData
         })
     end)
     
@@ -69,7 +75,7 @@ local function broadcastCommand(command, targetName, additionalData)
             command = command,
             target = targetName,
             sender = LocalPlayer.Name,
-            data = additionalData or {}
+            data = senderData
         })
     end)
 end
@@ -117,13 +123,24 @@ function processCommand(commandData)
         ExecuteSharingan()
     elseif command == "bring" and targetPlayer == LocalPlayer then
         local targetRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local senderRoot = senderPlayer and senderPlayer.Character and senderPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if targetRoot and senderRoot then
+        
+        -- Usar a posição enviada pelo sender ou tentar encontrar o sender
+        local senderPosition = nil
+        if data.senderPosition then
+            senderPosition = data.senderPosition
+        else
+            local senderRoot = senderPlayer and senderPlayer.Character and senderPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if senderRoot then
+                senderPosition = senderRoot.CFrame
+            end
+        end
+        
+        if targetRoot and senderPosition then
             -- Criar efeito na posição original
             CreateTeleportEffect(targetRoot.Position)
             
-            -- Teleportar o jogador
-            targetRoot.CFrame = senderRoot.CFrame + Vector3.new(2, 0, 0)
+            -- Teleportar o jogador para a posição do sender
+            targetRoot.CFrame = senderPosition + Vector3.new(2, 0, 0)
             
             -- Criar efeito na nova posição após um pequeno delay
             task.wait(0.1)
