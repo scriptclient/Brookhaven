@@ -1,0 +1,476 @@
+-- ESP Name Display System para Roblox
+-- Mostra jogadores que estão usando o mesmo script
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Configurações do ESP
+local ESP_CONFIG = {
+    ESP_ID = "ESP_SCRIPT_2024",
+    MaxDistance = 500,
+    ShowDistance = true,
+    ShowHealth = true,
+    TextSize = 14,
+    BoxColor = Color3.fromRGB(0, 255, 0),
+    TextColor = Color3.fromRGB(255, 255, 255),
+    BackgroundColor = Color3.fromRGB(0, 0, 0),
+    Transparency = 0.3
+}
+
+-- Tabelas para armazenar dados
+local ESPObjects = {}
+local ActiveUsers = {}
+local GUI = nil
+
+-- Função para criar a GUI principal
+local function CreateMainGUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ESP_Display"
+    ScreenGui.Parent = PlayerGui
+    ScreenGui.ResetOnSpawn = false
+    
+    -- Frame principal
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 300, 0, 200)
+    MainFrame.Position = UDim2.new(0, 20, 0, 20)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.BorderSizePixel = 2
+    MainFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
+    MainFrame.Parent = ScreenGui
+    
+    -- Título
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Position = UDim2.new(0, 0, 0, 0)
+    Title.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Title.Font = Enum.Font.SourceCodePro
+    Title.TextSize = 16
+    Title.Text = "ESP NAME SYSTEM v2.1"
+    Title.TextStrokeTransparency = 0
+    Title.Parent = MainFrame
+    
+    -- Status
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Name = "Status"
+    StatusLabel.Size = UDim2.new(1, -20, 0, 25)
+    StatusLabel.Position = UDim2.new(0, 10, 0, 40)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    StatusLabel.Font = Enum.Font.SourceCodePro
+    StatusLabel.TextSize = 12
+    StatusLabel.Text = "Status: ATIVO"
+    StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    StatusLabel.Parent = MainFrame
+    
+    -- Contador de usuários
+    local UserCount = Instance.new("TextLabel")
+    UserCount.Name = "UserCount"
+    UserCount.Size = UDim2.new(1, -20, 0, 25)
+    UserCount.Position = UDim2.new(0, 10, 0, 65)
+    UserCount.BackgroundTransparency = 1
+    UserCount.TextColor3 = Color3.fromRGB(255, 255, 0)
+    UserCount.Font = Enum.Font.SourceCodePro
+    UserCount.TextSize = 12
+    UserCount.Text = "Usuários Online: 0"
+    UserCount.TextXAlignment = Enum.TextXAlignment.Left
+    UserCount.Parent = MainFrame
+    
+    -- ID do script
+    local ScriptID = Instance.new("TextLabel")
+    ScriptID.Name = "ScriptID"
+    ScriptID.Size = UDim2.new(1, -20, 0, 25)
+    ScriptID.Position = UDim2.new(0, 10, 0, 90)
+    ScriptID.BackgroundTransparency = 1
+    ScriptID.TextColor3 = Color3.fromRGB(255, 255, 0)
+    ScriptID.Font = Enum.Font.SourceCodePro
+    ScriptID.TextSize = 12
+    ScriptID.Text = "Código ID: " .. ESP_CONFIG.ESP_ID
+    ScriptID.TextXAlignment = Enum.TextXAlignment.Left
+    ScriptID.Parent = MainFrame
+    
+    -- Botões de controle
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Name = "ToggleButton"
+    ToggleButton.Size = UDim2.new(0, 80, 0, 30)
+    ToggleButton.Position = UDim2.new(0, 10, 0, 120)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.Font = Enum.Font.SourceCodePro
+    ToggleButton.TextSize = 12
+    ToggleButton.Text = "ESP ON"
+    ToggleButton.Parent = MainFrame
+    
+    local ClearButton = Instance.new("TextButton")
+    ClearButton.Name = "ClearButton"
+    ClearButton.Size = UDim2.new(0, 80, 0, 30)
+    ClearButton.Position = UDim2.new(0, 100, 0, 120)
+    ClearButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    ClearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ClearButton.Font = Enum.Font.SourceCodePro
+    ClearButton.TextSize = 12
+    ClearButton.Text = "LIMPAR"
+    ClearButton.Parent = MainFrame
+    
+    local RefreshButton = Instance.new("TextButton")
+    RefreshButton.Name = "RefreshButton"
+    RefreshButton.Size = UDim2.new(0, 80, 0, 30)
+    RefreshButton.Position = UDim2.new(0, 190, 0, 120)
+    RefreshButton.BackgroundColor3 = Color3.fromRGB(0, 0, 100)
+    RefreshButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    RefreshButton.Font = Enum.Font.SourceCodePro
+    RefreshButton.TextSize = 12
+    RefreshButton.Text = "REFRESH"
+    RefreshButton.Parent = MainFrame
+    
+    -- Indicador de conexão
+    local ConnectionDot = Instance.new("Frame")
+    ConnectionDot.Name = "ConnectionDot"
+    ConnectionDot.Size = UDim2.new(0, 10, 0, 10)
+    ConnectionDot.Position = UDim2.new(0, 10, 0, 160)
+    ConnectionDot.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    ConnectionDot.BorderSizePixel = 0
+    ConnectionDot.Parent = MainFrame
+    
+    local ConnectionLabel = Instance.new("TextLabel")
+    ConnectionLabel.Name = "ConnectionLabel"
+    ConnectionLabel.Size = UDim2.new(0, 100, 0, 10)
+    ConnectionLabel.Position = UDim2.new(0, 25, 0, 160)
+    ConnectionLabel.BackgroundTransparency = 1
+    ConnectionLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    ConnectionLabel.Font = Enum.Font.SourceCodePro
+    ConnectionLabel.TextSize = 10
+    ConnectionLabel.Text = "CONECTADO"
+    ConnectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+    ConnectionLabel.Parent = MainFrame
+    
+    return ScreenGui, MainFrame, ToggleButton, ClearButton, RefreshButton, UserCount, ConnectionDot
+end
+
+-- Função para criar ESP em um jogador
+local function CreateESP(player)
+    if player == LocalPlayer then return end
+    if ESPObjects[player] then return end
+    
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+    
+    -- Criar BillboardGui
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "ESP_" .. player.Name
+    billboardGui.Adornee = rootPart
+    billboardGui.Size = UDim2.new(0, 200, 0, 100)
+    billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Parent = rootPart
+    
+    -- Frame principal do ESP
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(1, 0, 1, 0)
+    mainFrame.BackgroundColor3 = ESP_CONFIG.BackgroundColor
+    mainFrame.BackgroundTransparency = ESP_CONFIG.Transparency
+    mainFrame.BorderSizePixel = 2
+    mainFrame.BorderColor3 = ESP_CONFIG.BoxColor
+    mainFrame.Parent = billboardGui
+    
+    -- Nome do jogador
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Name = "NameLabel"
+    nameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.TextColor3 = ESP_CONFIG.TextColor
+    nameLabel.Font = Enum.Font.SourceCodePro
+    nameLabel.TextSize = ESP_CONFIG.TextSize
+    nameLabel.Text = player.Name
+    nameLabel.TextStrokeTransparency = 0
+    nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    nameLabel.Parent = mainFrame
+    
+    -- Status do ESP
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Name = "StatusLabel"
+    statusLabel.Size = UDim2.new(1, 0, 0.25, 0)
+    statusLabel.Position = UDim2.new(0, 0, 0.3, 0)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    statusLabel.Font = Enum.Font.SourceCodePro
+    statusLabel.TextSize = 10
+    statusLabel.Text = "[ESP ATIVO]"
+    statusLabel.TextStrokeTransparency = 0
+    statusLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    statusLabel.Parent = mainFrame
+    
+    -- Distância
+    local distanceLabel = Instance.new("TextLabel")
+    distanceLabel.Name = "DistanceLabel"
+    distanceLabel.Size = UDim2.new(1, 0, 0.25, 0)
+    distanceLabel.Position = UDim2.new(0, 0, 0.55, 0)
+    distanceLabel.BackgroundTransparency = 1
+    distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+    distanceLabel.Font = Enum.Font.SourceCodePro
+    distanceLabel.TextSize = 10
+    distanceLabel.Text = "Distância: 0m"
+    distanceLabel.TextStrokeTransparency = 0
+    distanceLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    distanceLabel.Parent = mainFrame
+    
+    -- Health
+    local healthLabel = Instance.new("TextLabel")
+    healthLabel.Name = "HealthLabel"
+    healthLabel.Size = UDim2.new(1, 0, 0.2, 0)
+    healthLabel.Position = UDim2.new(0, 0, 0.8, 0)
+    healthLabel.BackgroundTransparency = 1
+    healthLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    healthLabel.Font = Enum.Font.SourceCodePro
+    healthLabel.TextSize = 10
+    healthLabel.Text = "HP: " .. math.floor(humanoid.Health)
+    healthLabel.TextStrokeTransparency = 0
+    healthLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    healthLabel.Parent = mainFrame
+    
+    -- Armazenar objetos
+    ESPObjects[player] = {
+        BillboardGui = billboardGui,
+        MainFrame = mainFrame,
+        NameLabel = nameLabel,
+        StatusLabel = statusLabel,
+        DistanceLabel = distanceLabel,
+        HealthLabel = healthLabel,
+        Character = character,
+        RootPart = rootPart,
+        Humanoid = humanoid
+    }
+    
+    -- Adicionar à lista de usuários ativos
+    ActiveUsers[player.Name] = {
+        Player = player,
+        JoinTime = tick(),
+        Status = "Online"
+    }
+end
+
+-- Função para atualizar ESP
+local function UpdateESP()
+    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+    
+    local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
+    
+    for player, espData in pairs(ESPObjects) do
+        if player.Character and espData.RootPart and espData.RootPart.Parent then
+            -- Calcular distância
+            local distance = (playerPos - espData.RootPart.Position).Magnitude
+            
+            -- Atualizar distância
+            if ESP_CONFIG.ShowDistance then
+                espData.DistanceLabel.Text = "Distância: " .. math.floor(distance) .. "m"
+            end
+            
+            -- Atualizar health
+            if ESP_CONFIG.ShowHealth and espData.Humanoid then
+                espData.HealthLabel.Text = "HP: " .. math.floor(espData.Humanoid.Health)
+                
+                -- Mudar cor baseado na health
+                local healthPercent = espData.Humanoid.Health / espData.Humanoid.MaxHealth
+                if healthPercent > 0.7 then
+                    espData.HealthLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+                elseif healthPercent > 0.3 then
+                    espData.HealthLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                else
+                    espData.HealthLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+                end
+            end
+            
+            -- Esconder se muito longe
+            if distance > ESP_CONFIG.MaxDistance then
+                espData.BillboardGui.Enabled = false
+            else
+                espData.BillboardGui.Enabled = true
+            end
+        end
+    end
+end
+
+-- Função para remover ESP
+local function RemoveESP(player)
+    if ESPObjects[player] then
+        if ESPObjects[player].BillboardGui then
+            ESPObjects[player].BillboardGui:Destroy()
+        end
+        ESPObjects[player] = nil
+    end
+    
+    if ActiveUsers[player.Name] then
+        ActiveUsers[player.Name] = nil
+    end
+end
+
+-- Função para limpar todos os ESPs
+local function ClearAllESP()
+    for player, _ in pairs(ESPObjects) do
+        RemoveESP(player)
+    end
+    ESPObjects = {}
+    ActiveUsers = {}
+end
+
+-- Função para atualizar contador de usuários
+local function UpdateUserCount()
+    if GUI then
+        local count = 0
+        for _, _ in pairs(ActiveUsers) do
+            count = count + 1
+        end
+        GUI.UserCount.Text = "Usuários Online: " .. count
+    end
+end
+
+-- Função para animar o indicador de conexão
+local function AnimateConnectionDot()
+    if GUI and GUI.ConnectionDot then
+        local tween = TweenService:Create(
+            GUI.ConnectionDot,
+            TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+            {BackgroundTransparency = 0.7}
+        )
+        tween:Play()
+    end
+end
+
+-- Criar GUI principal
+local ScreenGui, MainFrame, ToggleButton, ClearButton, RefreshButton, UserCount, ConnectionDot = CreateMainGUI()
+GUI = {
+    ScreenGui = ScreenGui,
+    MainFrame = MainFrame,
+    ToggleButton = ToggleButton,
+    ClearButton = ClearButton,
+    RefreshButton = RefreshButton,
+    UserCount = UserCount,
+    ConnectionDot = ConnectionDot
+}
+
+-- Variáveis de controle
+local ESPEnabled = true
+
+-- Eventos dos botões
+ToggleButton.MouseButton1Click:Connect(function()
+    ESPEnabled = not ESPEnabled
+    if ESPEnabled then
+        ToggleButton.Text = "ESP ON"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        -- Recriar ESP para todos os jogadores
+        for _, player in pairs(Players:GetPlayers()) do
+            CreateESP(player)
+        end
+    else
+        ToggleButton.Text = "ESP OFF"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+        ClearAllESP()
+    end
+end)
+
+ClearButton.MouseButton1Click:Connect(function()
+    ClearAllESP()
+    UpdateUserCount()
+end)
+
+RefreshButton.MouseButton1Click:Connect(function()
+    ClearAllESP()
+    if ESPEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            CreateESP(player)
+        end
+    end
+    UpdateUserCount()
+end)
+
+-- Eventos de jogadores
+Players.PlayerAdded:Connect(function(player)
+    if ESPEnabled then
+        player.CharacterAdded:Connect(function()
+            wait(1) -- Aguardar carregar completamente
+            CreateESP(player)
+            UpdateUserCount()
+        end)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    RemoveESP(player)
+    UpdateUserCount()
+end)
+
+-- Inicializar ESP para jogadores já presentes
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer and ESPEnabled then
+        if player.Character then
+            CreateESP(player)
+        else
+            player.CharacterAdded:Connect(function()
+                wait(1)
+                CreateESP(player)
+                UpdateUserCount()
+            end)
+        end
+    end
+end
+
+-- Loop principal de atualização
+RunService.Heartbeat:Connect(function()
+    if ESPEnabled then
+        UpdateESP()
+        UpdateUserCount()
+    end
+end)
+
+-- Iniciar animação do indicador
+AnimateConnectionDot()
+
+-- Tornar a GUI arrastável
+local UIS = UserInputService
+local dragToggle = nil
+local dragSpeed = 0.25
+local dragStart = nil
+local startPos = nil
+
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    game:GetService('TweenService'):Create(MainFrame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        dragToggle = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragToggle = false
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if dragToggle then
+            updateInput(input)
+        end
+    end
+end)
+
+print("ESP Name Display System carregado!")
+print("ID do Script: " .. ESP_CONFIG.ESP_ID)
+print("Use os botões na GUI para controlar o ESP.")
