@@ -9,6 +9,7 @@ local Window = redzlib:MakeWindow({
     SubTitle = "          by: Magnus999",
     SaveFolder = "redz Hub | Brookhaven RP.lua"
 })
+
 Window:AddMinimizeButton({
 	Button = {
 		Image = "rbxassetid://72495850369898"
@@ -28,38 +29,55 @@ local Tabs = {
     H = Window:MakeTab({"Início", "flower"})
 }
 
-
+-- Configuração do ID único do script
 getgenv().ScriptID = "DRIP_CLIENT_2024"
 local LocalPlayer = game.Players.LocalPlayer
-LocalPlayer:SetAttribute("ScriptID", getgenv().ScriptID)
+
+-- Definir atributo imediatamente quando o jogador spawnar
+local function SetPlayerAttribute()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer:SetAttribute("ScriptID", getgenv().ScriptID)
+        print("Atributo definido para:", LocalPlayer.Name)
+    end
+end
+
+-- Definir atributo agora e quando respawnar
+SetPlayerAttribute()
+LocalPlayer.CharacterAdded:Connect(SetPlayerAttribute)
 
 -- Estado
 local ESPObjects = {}
 local ESPEnabled = false
 local DripUsers = {}
 
--- Funções de ESP
+-- Funções de ESP aprimoradas
 local function CreateDripESP(player)
+    -- Remover ESP existente primeiro
+    RemoveDripESP(player)
+    
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local BillboardGui = Instance.new("BillboardGui")
         BillboardGui.Name = "DripESP"
         BillboardGui.Adornee = player.Character.HumanoidRootPart
-        BillboardGui.Size = UDim2.new(0, 100, 0, 20)
+        BillboardGui.Size = UDim2.new(0, 120, 0, 25)
         BillboardGui.StudsOffset = Vector3.new(0, 3, 0)
         BillboardGui.AlwaysOnTop = true
-
+        
         local TextLabel = Instance.new("TextLabel")
         TextLabel.Size = UDim2.new(1, 0, 1, 0)
         TextLabel.BackgroundTransparency = 1
-        TextLabel.Text = "✅ DRIP"
+        TextLabel.Text = "✅ DRIP CLIENT"
         TextLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
         TextLabel.TextStrokeTransparency = 0.5
+        TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
         TextLabel.Font = Enum.Font.SourceSansBold
         TextLabel.TextScaled = true
         TextLabel.Parent = BillboardGui
-
+        
         BillboardGui.Parent = player.Character
         ESPObjects[player] = BillboardGui
+        
+        print("ESP criado para:", player.Name)
     end
 end
 
@@ -67,27 +85,93 @@ local function RemoveDripESP(player)
     if ESPObjects[player] then
         ESPObjects[player]:Destroy()
         ESPObjects[player] = nil
+        print("ESP removido para:", player.Name)
     end
 end
 
+-- Função de detecção melhorada
 local function DetectarDripUsers()
+    local foundUsers = 0
+    
     for _, player in pairs(game.Players:GetPlayers()) do
-        if player ~= LocalPlayer and player:GetAttribute("ScriptID") == getgenv().ScriptID then
-            if not DripUsers[player.Name] then
-                DripUsers[player.Name] = true
-                if ESPEnabled then
-                    CreateDripESP(player)
+        if player ~= LocalPlayer then
+            local playerScriptID = player:GetAttribute("ScriptID")
+            
+            -- Debug: mostrar todos os atributos do jogador
+            if playerScriptID then
+                print("Jogador", player.Name, "tem ScriptID:", playerScriptID)
+            end
+            
+            if playerScriptID == getgenv().ScriptID then
+                foundUsers = foundUsers + 1
+                
+                if not DripUsers[player.Name] then
+                    DripUsers[player.Name] = true
+                    print("Novo usuário Drip detectado:", player.Name)
+                    
+                    if ESPEnabled then
+                        CreateDripESP(player)
+                    end
+                end
+            else
+                -- Remover usuário se não tem mais o atributo
+                if DripUsers[player.Name] then
+                    DripUsers[player.Name] = nil
+                    RemoveDripESP(player)
+                    print("Usuário Drip removido:", player.Name)
                 end
             end
         end
     end
+    
+    -- Debug: mostrar quantos usuários foram encontrados
+    if foundUsers > 0 then
+        print("Total de usuários Drip encontrados:", foundUsers)
+    end
 end
 
--- Loop de detecção automática
+-- Eventos para quando jogadores entram/saem
+game.Players.PlayerAdded:Connect(function(player)
+    print("Jogador entrou:", player.Name)
+    task.wait(2) -- Aguardar um pouco para o jogador carregar
+    DetectarDripUsers()
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    print("Jogador saiu:", player.Name)
+    if DripUsers[player.Name] then
+        DripUsers[player.Name] = nil
+        RemoveDripESP(player)
+    end
+end)
+
+-- Evento para quando um jogador respawna
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(1) -- Aguardar o personagem carregar completamente
+        if DripUsers[player.Name] and ESPEnabled then
+            CreateDripESP(player)
+        end
+    end)
+end)
+
+-- Para jogadores já no jogo
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        player.CharacterAdded:Connect(function()
+            task.wait(1)
+            if DripUsers[player.Name] and ESPEnabled then
+                CreateDripESP(player)
+            end
+        end)
+    end
+end
+
+-- Loop de detecção automática melhorado
 task.spawn(function()
     while true do
         DetectarDripUsers()
-        task.wait(3)
+        task.wait(5) -- Aumentei o intervalo para reduzir spam
     end
 end)
 
@@ -100,6 +184,8 @@ local Toggle = Tabs.H:AddToggle({
 
 Toggle:Callback(function(Value)
 	ESPEnabled = Value
+	print("ESP", Value and "ativado" or "desativado")
+	
 	for playerName, _ in pairs(DripUsers) do
 		local player = game.Players:FindFirstChild(playerName)
 		if player then
@@ -111,3 +197,27 @@ Toggle:Callback(function(Value)
 		end
 	end
 end)
+
+-- Comando de debug para testar manualmente
+Tabs.M:AddButton({
+    Name = "🔍 Debug: Verificar Usuários",
+    Description = "Mostra informações de debug no console",
+    Callback = function()
+        print("=== DEBUG DRIP CLIENT ===")
+        print("Meu ScriptID:", getgenv().ScriptID)
+        print("Meu atributo:", LocalPlayer:GetAttribute("ScriptID"))
+        print("Usuários Drip detectados:", #DripUsers)
+        
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local attr = player:GetAttribute("ScriptID")
+                print("Jogador:", player.Name, "| ScriptID:", attr or "nenhum")
+            end
+        end
+        print("========================")
+    end
+})
+
+-- Teste inicial
+print("Drip Client carregado para:", LocalPlayer.Name)
+print("ScriptID configurado:", getgenv().ScriptID)
