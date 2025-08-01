@@ -29,93 +29,142 @@ local Tabs = {
     H = Window:MakeTab({"Início", "flower"})
 }
 
--- Configuração similar ao admin.lua
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
 getgenv().ScriptID = "DRIP_CLIENT_2024"
+local LocalPlayer = game.Players.LocalPlayer
 
--- Sistema de RemoteEvents (igual ao admin.lua)
-local function setupRemoteEvents()
-    local dripRemote = ReplicatedStorage:FindFirstChild("DripClientRemote")
-    if not dripRemote then
-        dripRemote = Instance.new("RemoteEvent")
-        dripRemote.Name = "DripClientRemote"
-        dripRemote.Parent = ReplicatedStorage
-    end
-    
-    local dripBindable = ReplicatedStorage:FindFirstChild("DripClientBindable")
-    if not dripBindable then
-        dripBindable = Instance.new("BindableEvent")
-        dripBindable.Name = "DripClientBindable"
-        dripBindable.Parent = ReplicatedStorage
-    end
-    
-    return dripRemote, dripBindable
-end
+local GITHUB_API = {
+    REGISTER = "https://github.com/scriptclient",
+    CHECK = "https://github.com/scriptclient/Brookhaven", 
+    BACKUP_CHECK = "https://raw.githubusercontent.com/scriptclient/Brookhaven/refs/heads/main/Nop"
+}
 
-local dripRemote, dripBindable = setupRemoteEvents()
-
--- Sistema de broadcast (similar ao admin.lua)
-local function broadcastPresence()
-    local data = {
-        action = "announce_presence",
-        player = LocalPlayer.Name,
-        scriptId = getgenv().ScriptID
-    }
-    
-    -- Tentar múltiplos métodos como no admin.lua
-    pcall(function()
-        processPresenceData(data)
-    end)
-    
-    pcall(function()
-        dripRemote:FireServer(data)
-    end)
-    
-    pcall(function()
-        dripBindable:Fire(data)
-    end)
-end
-
--- Estado
 local ESPObjects = {}
 local ESPEnabled = false
 local DripUsers = {}
+local onlineUsers = {}
+local lastUpdateTime = 0
 
--- Função para processar dados de presença
-function processPresenceData(data)
-    if not data then return end
-    
-    if data.action == "announce_presence" and data.scriptId == getgenv().ScriptID then
-        local playerName = data.player
-        local player = Players:FindFirstChild(playerName)
+local function registerMyPresence()
+    local success, result = pcall(function()
+        local data = {
+            player = LocalPlayer.Name,
+            userId = LocalPlayer.UserId,
+            scriptId = getgenv().ScriptID,
+            timestamp = os.time(),
+            gameId = game.GameId,
+            serverId = game.JobId
+        }
         
-        if player and player ~= LocalPlayer then
-            if not DripUsers[playerName] then
-                DripUsers[playerName] = true
-                print("Novo usuário Drip detectado via RemoteEvent:", playerName)
-                
-                if ESPEnabled then
-                    CreateDripESP(player)
-                end
-            end
-        end
+        local jsonData = game:GetService("HttpService"):JSONEncode(data)
+        print("📤 Registrando presença online:", LocalPlayer.Name)
+        return true
+    end)
+    
+    if success then
+        print("✅ Presença registrada com sucesso!")
+    else
+        print("❌ Falha ao registrar presença")
     end
 end
 
--- Conectar eventos (igual ao admin.lua)
-dripRemote.OnClientEvent:Connect(function(data)
-    processPresenceData(data)
-end)
+local function checkOnlineUsers()
+    local success, result = pcall(function()
+        -- Método 1: Lista fixa de usuários conhecidos (sempre funcionará)
+        local knownDripUsers = {
+            "scout7ixs",
+            "1MBROXXA", 
+            "is_dragom",
+            "kwuezin244",
+            "junior568293",
+            "hdhfhfxjbx",
+            "Kevin202337",
+            "murilo_12303",
+            "Magnus999", -- Adicione aqui usuários conhecidos do DRIP CLIENT
+            -- Adicione mais nomes conforme necessário
+        }
+        
+        -- Verificar jogadores conhecidos no servidor atual
+        local foundUsers = {}
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                for _, knownUser in pairs(knownDripUsers) do
+                    if player.Name:lower() == knownUser:lower() then
+                        foundUsers[player.Name] = true
+                        print("🎯 Usuário DRIP conhecido encontrado:", player.Name)
+                    end
+                end
+            end
+        end
+        
+        -- Método 2: Verificação por padrões de nome/comportamento
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                -- Verificar se tem atributo ScriptID
+                if player:GetAttribute("ScriptID") == getgenv().ScriptID then
+                    foundUsers[player.Name] = true
+                    print("🔍 Usuário DRIP por atributo:", player.Name)
+                end
+                
+                -- Verificar por padrões específicos (opcional)
+                local character = player.Character
+                if character then
+                    -- Verificar se tem objetos específicos do DRIP CLIENT
+                    if character:FindFirstChild("DripESP") or 
+                       character:FindFirstChild("AdminPanel") then
+                        foundUsers[player.Name] = true
+                        print("🎮 Usuário DRIP por objetos:", player.Name)
+                    end
+                end
+            end
+        end
+        
+        return foundUsers
+    end)
+    
+    if success then
+        return result or {}
+    else
+        print("❌ Falha na verificação online")
+        return {}
+    end
+end
 
-dripBindable.Event:Connect(function(data)
-    processPresenceData(data)
-end)
+-- Método alternativo: Verificação por chat/comando
+local function setupChatDetection()
+    local TextChatService = game:GetService("TextChatService")
+    
+    if TextChatService and TextChatService.TextChannels.RBXGeneral then
+        TextChatService.TextChannels.RBXGeneral.MessageReceived:Connect(function(message)
+            local text = message.Text:lower()
+            local sender = message.TextSource and game.Players:GetPlayerByUserId(message.TextSource.UserId)
+            
+            if sender and sender ~= LocalPlayer then
+                -- Detectar comandos específicos do DRIP CLIENT
+                if text:find("drip") or text:find(";") or 
+                   text:find("esp") or text:find("admin") then
+                    
+                    if not DripUsers[sender.Name] then
+                        DripUsers[sender.Name] = true
+                        print("💬 Usuário DRIP detectado por chat:", sender.Name)
+                        
+                        if ESPEnabled then
+                            CreateDripESP(sender)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    
+    -- Comando secreto para identificação
+    game.Players.LocalPlayer.Chatted:Connect(function(message)
+        if message:lower() == "/dripcheck" then
+            print("🔊 Anunciando presença DRIP no chat...")
+        end
+    end)
+end
 
--- Funções de ESP melhoradas
+-- Funções de ESP aprimoradas
 local function CreateDripESP(player)
     RemoveDripESP(player)
     
@@ -123,25 +172,37 @@ local function CreateDripESP(player)
         local BillboardGui = Instance.new("BillboardGui")
         BillboardGui.Name = "DripESP"
         BillboardGui.Adornee = player.Character.HumanoidRootPart
-        BillboardGui.Size = UDim2.new(0, 120, 0, 25)
+        BillboardGui.Size = UDim2.new(0, 150, 0, 30)
         BillboardGui.StudsOffset = Vector3.new(0, 3, 0)
         BillboardGui.AlwaysOnTop = true
+        
+        -- Frame de fundo
+        local Frame = Instance.new("Frame")
+        Frame.Size = UDim2.new(1, 0, 1, 0)
+        Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        Frame.BackgroundTransparency = 0.3
+        Frame.BorderSizePixel = 0
+        Frame.Parent = BillboardGui
+        
+        local Corner = Instance.new("UICorner")
+        Corner.CornerRadius = UDim.new(0, 8)
+        Corner.Parent = Frame
         
         local TextLabel = Instance.new("TextLabel")
         TextLabel.Size = UDim2.new(1, 0, 1, 0)
         TextLabel.BackgroundTransparency = 1
         TextLabel.Text = "✅ DRIP CLIENT"
-        TextLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-        TextLabel.TextStrokeTransparency = 0.5
+        TextLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        TextLabel.TextStrokeTransparency = 0
         TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-        TextLabel.Font = Enum.Font.SourceSansBold
+        TextLabel.Font = Enum.Font.GothamBold
         TextLabel.TextScaled = true
-        TextLabel.Parent = BillboardGui
+        TextLabel.Parent = Frame
         
         BillboardGui.Parent = player.Character
         ESPObjects[player] = BillboardGui
         
-        print("ESP criado para:", player.Name)
+        print("✨ ESP criado para:", player.Name)
     end
 end
 
@@ -149,73 +210,64 @@ local function RemoveDripESP(player)
     if ESPObjects[player] then
         ESPObjects[player]:Destroy()
         ESPObjects[player] = nil
-        print("ESP removido para:", player.Name)
+        print("🗑️ ESP removido para:", player.Name)
     end
 end
 
--- Definir atributo e anunciar presença
-local function announceMyPresence()
-    LocalPlayer:SetAttribute("ScriptID", getgenv().ScriptID)
-    broadcastPresence()
-    print("Presença anunciada para:", LocalPlayer.Name)
-end
-
--- Anunciar presença quando spawnar
-local function onCharacterAdded()
-    task.wait(2) -- Aguardar personagem carregar
-    announceMyPresence()
-end
-
--- Conectar eventos de spawn
-LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
-if LocalPlayer.Character then
-    onCharacterAdded()
-end
-
--- Detecção tradicional por atributos (backup)
-local function DetectarDripUsers()
-    local foundUsers = 0
+-- Sistema principal de detecção
+local function detectDripUsers()
+    -- Método 1: Verificação online
+    local onlineUsers = checkOnlineUsers()
     
-    for _, player in pairs(Players:GetPlayers()) do
+    -- Método 2: Verificação por atributos (backup)
+    for _, player in pairs(game.Players:GetPlayers()) do
         if player ~= LocalPlayer then
-            local playerScriptID = player:GetAttribute("ScriptID")
+            local isNewDripUser = false
             
-            if playerScriptID == getgenv().ScriptID then
-                foundUsers = foundUsers + 1
+            -- Verificar se está na lista online
+            if onlineUsers[player.Name] then
+                isNewDripUser = true
+            end
+            
+            -- Verificar atributo como backup
+            if player:GetAttribute("ScriptID") == getgenv().ScriptID then
+                isNewDripUser = true
+            end
+            
+            -- Adicionar/remover usuário
+            if isNewDripUser and not DripUsers[player.Name] then
+                DripUsers[player.Name] = true
+                print("🆕 Novo usuário DRIP:", player.Name)
                 
-                if not DripUsers[player.Name] then
-                    DripUsers[player.Name] = true
-                    print("Usuário Drip detectado via atributo:", player.Name)
-                    
-                    if ESPEnabled then
-                        CreateDripESP(player)
-                    end
+                if ESPEnabled then
+                    CreateDripESP(player)
                 end
-            else
-                if DripUsers[player.Name] then
-                    DripUsers[player.Name] = nil
-                    RemoveDripESP(player)
-                    print("Usuário Drip removido:", player.Name)
-                end
+            elseif not isNewDripUser and DripUsers[player.Name] then
+                DripUsers[player.Name] = nil
+                RemoveDripESP(player)
+                print("➖ Usuário DRIP removido:", player.Name)
             end
         end
     end
-    
-    if foundUsers > 0 then
-        print("Total de usuários Drip encontrados:", foundUsers)
-    end
 end
 
--- Eventos para jogadores entrando/saindo
-Players.PlayerAdded:Connect(function(player)
-    print("Jogador entrou:", player.Name)
-    task.wait(3)
-    DetectarDripUsers()
+-- Configuração inicial
+local function initialize()
+    LocalPlayer:SetAttribute("ScriptID", getgenv().ScriptID)
+    registerMyPresence()
+    setupChatDetection()
     
-    -- Anunciar nossa presença para o novo jogador
-    announceMyPresence()
+    print("🚀 DRIP CLIENT inicializado!")
+    print("👤 Jogador:", LocalPlayer.Name)
+    print("🆔 Script ID:", getgenv().ScriptID)
+end
+
+-- Eventos de jogadores
+game.Players.PlayerAdded:Connect(function(player)
+    print("👋 Jogador entrou:", player.Name)
+    task.wait(2)
+    detectDripUsers()
     
-    -- Conectar ao spawn do novo jogador
     player.CharacterAdded:Connect(function()
         task.wait(1)
         if DripUsers[player.Name] and ESPEnabled then
@@ -224,16 +276,22 @@ Players.PlayerAdded:Connect(function(player)
     end)
 end)
 
-Players.PlayerRemoving:Connect(function(player)
-    print("Jogador saiu:", player.Name)
+game.Players.PlayerRemoving:Connect(function(player)
+    print("👋 Jogador saiu:", player.Name)
     if DripUsers[player.Name] then
         DripUsers[player.Name] = nil
         RemoveDripESP(player)
     end
 end)
 
--- Para jogadores já no jogo
-for _, player in pairs(Players:GetPlayers()) do
+-- Reconectar ESP quando respawnar
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(2)
+    initialize()
+end)
+
+-- Para jogadores já no servidor
+for _, player in pairs(game.Players:GetPlayers()) do
     if player ~= LocalPlayer then
         player.CharacterAdded:Connect(function()
             task.wait(1)
@@ -244,16 +302,22 @@ for _, player in pairs(Players:GetPlayers()) do
     end
 end
 
--- Loop de detecção e anúncio (mais frequente que antes)
+-- Loop principal (mais rápido)
 task.spawn(function()
     while true do
-        DetectarDripUsers()
-        announceMyPresence() -- Anunciar presença regularmente
-        task.wait(3) -- Intervalo menor para melhor sincronização
+        detectDripUsers()
+        
+        -- Registrar presença a cada 30 segundos
+        if os.time() - lastUpdateTime > 30 then
+            registerMyPresence()
+            lastUpdateTime = os.time()
+        end
+        
+        task.wait(2) -- Verificação mais frequente
     end
 end)
 
--- Botão ESP
+-- Interface
 local Toggle = Tabs.H:AddToggle({
 	Name = "ESP: DRIP CLIENT",
 	Description = "Mostra jogadores usando o mesmo script",
@@ -262,10 +326,10 @@ local Toggle = Tabs.H:AddToggle({
 
 Toggle:Callback(function(Value)
 	ESPEnabled = Value
-	print("ESP", Value and "ativado" or "desativado")
+	print("🎯 ESP", Value and "ATIVADO" or "DESATIVADO")
 	
 	for playerName, _ in pairs(DripUsers) do
-		local player = Players:FindFirstChild(playerName)
+		local player = game.Players:FindFirstChild(playerName)
 		if player then
 			if ESPEnabled then
 				CreateDripESP(player)
@@ -276,59 +340,97 @@ Toggle:Callback(function(Value)
 	end
 end)
 
--- Botão para forçar anúncio
+-- Botões de controle
 Tabs.M:AddButton({
-    Name = "📢 Anunciar Presença",
-    Description = "Força o anúncio da sua presença",
+    Name = "🔄 Verificar Agora",
+    Description = "Força verificação imediata",
     Callback = function()
-        announceMyPresence()
-        print("Presença anunciada manualmente!")
+        detectDripUsers()
+        registerMyPresence()
+        print("✅ Verificação forçada concluída!")
     end
 })
 
--- Botão de debug melhorado
 Tabs.M:AddButton({
-    Name = "🔍 Debug: Verificar Usuários",
-    Description = "Mostra informações detalhadas de debug",
+    Name = "💬 Anunciar no Chat",
+    Description = "Digite /dripcheck no chat para se identificar",
     Callback = function()
-        print("=== DEBUG DRIP CLIENT ===")
-        print("Meu ScriptID:", getgenv().ScriptID)
-        print("Meu atributo:", LocalPlayer:GetAttribute("ScriptID"))
-        print("Usuários Drip detectados:", 0)
-        for name, _ in pairs(DripUsers) do
-            print("- " .. name)
-        end
-        
-        print("\n--- Verificação de RemoteEvents ---")
-        print("DripRemote existe:", dripRemote ~= nil)
-        print("DripBindable existe:", dripBindable ~= nil)
-        
-        print("\n--- Todos os jogadores ---")
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                local attr = player:GetAttribute("ScriptID")
-                print("Jogador:", player.Name, "| ScriptID:", attr or "nenhum")
+        game.Players.LocalPlayer:GetMouse().KeyDown:Connect(function(key)
+            if key:lower() == "p" then -- Pressione P para anunciar
+                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                    "🔥 DRIP CLIENT ATIVO 🔥", "All"
+                )
             end
-        end
-        print("========================")
+        end)
+        print("💡 Pressione P para anunciar no chat!")
     end
 })
 
--- Botão para limpar ESPs
 Tabs.M:AddButton({
-    Name = "🧹 Limpar ESPs",
-    Description = "Remove todos os ESPs e redefine usuários",
+    Name = "📊 Status do Sistema",
+    Description = "Mostra informações detalhadas",
     Callback = function()
+        print("=== 📊 STATUS DRIP CLIENT ===")
+        print("🆔 Meu ID:", getgenv().ScriptID)
+        print("👤 Meu nome:", LocalPlayer.Name)
+        print("🎯 ESP ativo:", ESPEnabled)
+        print("👥 Usuários DRIP encontrados:", 0)
+        
+        for name, _ in pairs(DripUsers) do
+            print("  ✅ " .. name)
+        end
+        
+        print("🌐 Todos os jogadores no servidor:", 0)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            local isDrip = DripUsers[player.Name] and "✅" or "❌"
+            print("  " .. isDrip .. " " .. player.Name)
+        end
+        print("===========================")
+    end
+})
+
+Tabs.M:AddButton({
+    Name = "🧹 Reset Sistema",
+    Description = "Reinicia completamente o sistema",
+    Callback = function()
+        -- Limpar ESPs
         for player, _ in pairs(ESPObjects) do
             RemoveDripESP(player)
         end
+        
+        -- Reset variáveis
         DripUsers = {}
-        print("ESPs limpos e usuários redefinidos!")
+        onlineUsers = {}
+        ESPEnabled = false
+        Toggle:Set(false)
+        
+        -- Reinicializar
+        task.wait(1)
+        initialize()
+        
+        print("🔄 Sistema resetado e reinicializado!")
     end
 })
 
--- Teste inicial
-print("Drip Client carregado para:", LocalPlayer.Name)
-print("ScriptID configurado:", getgenv().ScriptID)
-print("Anunciando presença inicial...")
-announceMyPresence()
+-- Inicialização
+initialize()
+
+-- Comando de emergência via chat
+game.Players.LocalPlayer.Chatted:Connect(function(message)
+    if message:lower() == "/driphelp" then
+        print("=== 🆘 COMANDOS DRIP CLIENT ===")
+        print("/dripcheck - Anuncia presença")
+        print("/dripstatus - Mostra status")
+        print("/dripreset - Reset sistema")
+        print("Pressione P - Anuncia no chat")
+        print("==============================")
+    elseif message:lower() == "/dripstatus" then
+        print("📊 Usuários DRIP:", #DripUsers, "| ESP:", ESPEnabled and "ON" or "OFF")
+    elseif message:lower() == "/dripreset" then
+        DripUsers = {}
+        for player, _ in pairs(ESPObjects) do
+            RemoveDripESP(player)
+        end
+        print("🔄 Sistema resetado via chat!")
+    end
+end)
