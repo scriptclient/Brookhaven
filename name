@@ -9,6 +9,7 @@ workspace.FallenPartsDestroyHeight = -math.huge
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -29,23 +30,70 @@ local UpdateConnection = nil
 local LastUpdate = 0
 local DripUsers = {}
 
+-- Sistema de identificação via RemoteEvent (método real)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Criar RemoteEvent para identificação
+local function GetOrCreateRemoteEvent()
+    local remoteName = "DripClientIdentifier"
+    local remote = ReplicatedStorage:FindFirstChild(remoteName)
+    
+    if not remote then
+        remote = Instance.new("RemoteEvent")
+        remote.Name = remoteName
+        remote.Parent = ReplicatedStorage
+    end
+    
+    return remote
+end
+
+local DripRemote = GetOrCreateRemoteEvent()
+
+-- Sinalizar que este jogador está usando DRIP CLIENT
+local function BroadcastDripClient()
+    pcall(function()
+        DripRemote:FireServer("DRIP_CLIENT_ACTIVE", ESP_CONFIG.ESP_ID)
+    end)
+end
+
+-- Escutar outros jogadores sinalizando
+DripRemote.OnClientEvent:Connect(function(player, message, clientId)
+    if message == "DRIP_CLIENT_ACTIVE" and clientId == ESP_CONFIG.ESP_ID then
+        DripUsers[player.Name] = {
+            HasDrip = true,
+            DetectedAt = tick(),
+            LastSeen = tick(),
+            Verified = true
+        }
+        
+        -- Se ESP estiver ativo, criar ESP para este jogador
+        if ESPEnabled and not ESPObjects[player] then
+            CreateDripESP(player)
+        end
+    end
+end)
+
 -- Função para verificar se jogador tem DRIP CLIENT
 local function PlayerHasDripClient(player)
     local playerData = DripUsers[player.Name]
-    if not playerData then
-        -- Simula 60% de chance de ter DRIP CLIENT
-        local hasDrip = math.random(1, 100) <= 60
-        DripUsers[player.Name] = {
-            HasDrip = hasDrip,
-            DetectedAt = tick(),
-            LastSeen = tick()
-        }
-        return hasDrip
-    else
+    if playerData and playerData.HasDrip and playerData.Verified then
         playerData.LastSeen = tick()
-        return playerData.HasDrip
+        return true
     end
+    return false
 end
+
+-- Broadcast inicial
+spawn(function()
+    wait(2) -- Aguardar carregar
+    BroadcastDripClient()
+    
+    -- Rebroadcast periodicamente
+    while true do
+        wait(30)
+        BroadcastDripClient()
+    end
+end)
 
 -- Função para remover ESP (declarada primeiro)
 local function RemoveDripESP(player)
@@ -300,10 +348,12 @@ spawn(function()
         wait(3)
         CheckForNewDripUsers()
         
-        -- Limpar dados antigos
+        -- Limpar dados antigos (apenas não verificados)
         local currentTime = tick()
         for playerName, data in pairs(DripUsers) do
-            if currentTime - data.LastSeen > 300 then
+            if not data.Verified and currentTime - data.LastSeen > 60 then
+                DripUsers[playerName] = nil
+            elseif data.Verified and currentTime - data.LastSeen > 300 then
                 DripUsers[playerName] = nil
             end
         end
@@ -367,12 +417,12 @@ end)
 -- Informações na aba Info
 Tabs.M:AddParagraph({
     Title = "🔥 DRIP CLIENT ESP",
-    Description = "Sistema que detecta e mostra jogadores usando o mesmo código.\n\n• Mostra 'DRIP CLIENT' em rosa pulsante\n• Nome do jogador abaixo\n• Efeitos visuais suaves\n• Detecção automática\n• Fade por distância"
+    Description = "Sistema que detecta APENAS jogadores usando o mesmo código DRIP CLIENT.\n\n• Detecção via RemoteEvent\n• Apenas usuários reais do script\n• Mostra 'DRIP CLIENT' em rosa pulsante\n• Nome do jogador abaixo\n• Efeitos visuais suaves"
 })
 
 Tabs.M:AddParagraph({
-    Title = "ℹ️ Como usar",
-    Description = "1. Ative o toggle 'DRIP CLIENT ESP'\n2. O sistema detectará automaticamente\n3. Jogadores com o código aparecerão marcados\n4. Desative o toggle para remover"
+    Title = "ℹ️ Como funciona",
+    Description = "O sistema usa comunicação via RemoteEvent para identificar jogadores que realmente estão usando o DRIP CLIENT.\n\nApenas jogadores com o script ativo aparecerão marcados!"
 })
 
 print("🔥 DRIP CLIENT System Loaded!")
