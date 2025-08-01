@@ -115,13 +115,19 @@ function processCommand(commandData)
         LocalPlayer:Kick("Você foi expulso pelo painel de admin por " .. senderName)
     elseif command == "sharingan" and targetPlayer == LocalPlayer then
         ExecuteSharingan()
-    elseif command == "bring" then
-        -- Se eu sou o alvo, me teleporto para o sender
-        if targetPlayer == LocalPlayer and senderPlayer then
-            BringPlayer(LocalPlayer, senderPlayer, true)
-        -- Se eu sou o sender e tenho permissão, trago o alvo para mim
-        elseif allowedUsers[senderName] and senderPlayer == LocalPlayer and targetPlayer ~= LocalPlayer then
-            BringPlayer(targetPlayer, LocalPlayer, true)
+    elseif command == "bring" and targetPlayer == LocalPlayer then
+        local targetRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local senderRoot = senderPlayer and senderPlayer.Character and senderPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot and senderRoot then
+            -- Criar efeito na posição original
+            CreateTeleportEffect(targetRoot.Position)
+            
+            -- Teleportar o jogador
+            targetRoot.CFrame = senderRoot.CFrame + Vector3.new(2, 0, 0)
+            
+            -- Criar efeito na nova posição após um pequeno delay
+            task.wait(0.1)
+            CreateTeleportEffect(targetRoot.Position)
         end
     end
 end
@@ -192,70 +198,44 @@ function ExecuteSharingan()
     )
 end
 
-function BringPlayer(targetPlayer, destinationPlayer, fromBroadcast)
-    if not targetPlayer or not destinationPlayer then return end
-    if targetPlayer == destinationPlayer then return end
+function CreateTeleportEffect(position)
+    local effect = Instance.new("Part")
+    effect.Name = "TeleportEffect"
+    effect.Size = Vector3.new(4, 8, 4)
+    effect.CFrame = CFrame.new(position)
+    effect.Anchored = true
+    effect.CanCollide = false
+    effect.Transparency = 0.5
+    effect.Color = Color3.fromRGB(0, 255, 255)
+    effect.Material = Enum.Material.Neon
+    effect.Shape = Enum.PartType.Cylinder
+    effect.Parent = workspace
     
-    local targetCharacter = targetPlayer.Character
-    local destCharacter = destinationPlayer.Character
+    local rotationTween = TweenService:Create(effect, 
+        TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), 
+        {Rotation = Vector3.new(0, 360, 0)}
+    )
+    rotationTween:Play()
     
-    if targetCharacter and destCharacter then
-        local targetHRP = targetCharacter:FindFirstChild("HumanoidRootPart")
-        local destHRP = destCharacter:FindFirstChild("HumanoidRootPart")
-        
-        if targetHRP and destHRP then
-            local originalPosition = targetHRP.CFrame
-            local destinationPosition = destHRP.CFrame * CFrame.new(3, 0, 0)
-            
-            local function createTeleportEffect(position)
-                local effect = Instance.new("Part")
-                effect.Name = "TeleportEffect"
-                effect.Size = Vector3.new(4, 8, 4)
-                effect.CFrame = CFrame.new(position.Position)
-                effect.Anchored = true
-                effect.CanCollide = false
-                effect.Transparency = 0.5
-                effect.Color = Color3.fromRGB(0, 255, 255)
-                effect.Material = Enum.Material.Neon
-                effect.Shape = Enum.PartType.Cylinder
-                effect.Parent = workspace
-                
-                local rotationTween = TweenService:Create(effect, 
-                    TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), 
-                    {Rotation = Vector3.new(0, 360, 0)}
-                )
-                rotationTween:Play()
-                
-                local fadeTween = TweenService:Create(effect, 
-                    TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
-                    {Transparency = 1, Size = Vector3.new(1, 1, 1)}
-                )
-                fadeTween:Play()
-                
-                fadeTween.Completed:Connect(function()
-                    effect:Destroy()
-                end)
-                
-                return effect
-            end
-            
-            createTeleportEffect(originalPosition)
-            targetHRP.CFrame = destinationPosition
-            
-            task.wait(0.1)
-            createTeleportEffect(destinationPosition)
-            
-            local sound = Instance.new("Sound")
-            sound.SoundId = "rbxassetid://131961136"
-            sound.Volume = 0.5
-            sound.Parent = workspace
-            sound:Play()
-            
-            sound.Ended:Connect(function()
-                sound:Destroy()
-            end)
-        end
-    end
+    local fadeTween = TweenService:Create(effect, 
+        TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+        {Transparency = 1, Size = Vector3.new(1, 1, 1)}
+    )
+    fadeTween:Play()
+    
+    fadeTween.Completed:Connect(function()
+        effect:Destroy()
+    end)
+    
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://131961136"
+    sound.Volume = 0.3
+    sound.Parent = workspace
+    sound:Play()
+    
+    sound.Ended:Connect(function()
+        sound:Destroy()
+    end)
 end
 
 function CreateJail(player, fromBroadcast)
