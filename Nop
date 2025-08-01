@@ -115,8 +115,14 @@ function processCommand(commandData)
         LocalPlayer:Kick("Você foi expulso pelo painel de admin por " .. senderName)
     elseif command == "sharingan" and targetPlayer == LocalPlayer then
         ExecuteSharingan()
-    elseif command == "bring" and targetPlayer ~= LocalPlayer then
-        BringPlayer(targetPlayer, LocalPlayer, true)
+    elseif command == "bring" then
+        -- Se eu sou o alvo, me teleporto para o sender
+        if targetPlayer == LocalPlayer and senderPlayer then
+            BringPlayer(LocalPlayer, senderPlayer, true)
+        -- Se eu sou o sender e tenho permissão, trago o alvo para mim
+        elseif allowedUsers[senderName] and senderPlayer == LocalPlayer and targetPlayer ~= LocalPlayer then
+            BringPlayer(targetPlayer, LocalPlayer, true)
+        end
     end
 end
 
