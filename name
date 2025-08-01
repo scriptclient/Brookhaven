@@ -9,7 +9,6 @@ local Window = redzlib:MakeWindow({
     SubTitle = "          by: Magnus999",
     SaveFolder = "redz Hub | Brookhaven RP.lua"
 })
-
 Window:AddMinimizeButton({
 	Button = {
 		Image = "rbxassetid://72495850369898"
@@ -23,7 +22,13 @@ Window:AddMinimizeButton({
 		Thickness = 1
 	}
 })
--- ScriptID do DRIP CLIENT
+
+local Tabs = {
+    M = Window:MakeTab({"Informações", "Info"}),
+    H = Window:MakeTab({"Início", "flower"})
+}
+
+
 getgenv().ScriptID = "DRIP_CLIENT_2024"
 local LocalPlayer = game.Players.LocalPlayer
 LocalPlayer:SetAttribute("ScriptID", getgenv().ScriptID)
