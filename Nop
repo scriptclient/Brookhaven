@@ -12,7 +12,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 getgenv().ScriptID = "DRIPCLIENTADM" 
 local allowedUsers = {
-    ["magnusfxp"] = true,
+    ["dripcliento"] = true,
 }
 
 local selectedPlayer = nil
