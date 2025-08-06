@@ -31,5 +31,6 @@ allowedUsers = {
     ["smulem_01"] = true, --Permanente
     ["rafael_502115"] = true, --5 Dias
     ["Pedrocamandrake391"] = true,
+    ["raheeeld"] = true, -- 4 dias
 }
 return allowedUsers
