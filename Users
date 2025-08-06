@@ -29,6 +29,6 @@ allowedUsers = {
     --["Lucas_gadou"] = true
     ["llenado123456"] = true,
     ["dede6luiz"] = true,
-    ["Smulem_01"] = true
+    ["smulem_01"] = true
 }
 return allowedUsers
