@@ -33,5 +33,6 @@ allowedUsers = {
     ["Pedrocamandrake391"] = true, --perm
     ["raheeeld"] = true, -- 4 dias
     ["kaiserfogo9"] = true, -- 4 dias
+    ["Luffy127706"] = true,
 }
 return allowedUsers
