@@ -30,5 +30,6 @@ allowedUsers = {
     ["llenado123456"] = true,
     ["dede6luiz"] = true,
     ["smulem_01"] = true,
+    ["rafael_502115"] = true,
 }
 return allowedUsers
