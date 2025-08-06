@@ -27,5 +27,7 @@ allowedUsers = {
     ["FOCOE_ORATATOUILLE"] = true,
     ["Diegopedrolll"] = true,
     --["Lucas_gadou"] = true
+    ["llenado123456"] = true,
+    ["dede6luiz"] = true,
 }
 return allowedUsers
