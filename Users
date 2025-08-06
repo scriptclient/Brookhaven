@@ -1,4 +1,4 @@
-local allowedUsers = {
+return {
     ["dripcliento"] = true,
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
