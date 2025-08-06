@@ -1,5 +1,4 @@
 allowedUsers = {
- --   ["dripcliento"] = true,
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
     ["divamona2"] = true,
