@@ -30,8 +30,8 @@ allowedUsers = {
     ["dede6luiz"] = true, --dias
     ["smulem_01"] = true, --Permanente
     ["rafael_502115"] = true, --5 Dias
-    ["Pedrocamandrake391"] = true,
+    ["Pedrocamandrake391"] = true, --perm
     ["raheeeld"] = true, -- 4 dias
-    ["kaiserfogo9"] = true,
+    ["kaiserfogo9"] = true, -- 4 dias
 }
 return allowedUsers
