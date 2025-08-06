@@ -1,4 +1,4 @@
-return {
+allowedUsers = {
     ["dripcliento"] = true,
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
@@ -27,3 +27,4 @@ return {
     ["collinschristine"] = true,
     ["paulo215726"] = true,
 }
+return allowedUsers
