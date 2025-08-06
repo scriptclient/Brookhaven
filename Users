@@ -32,5 +32,6 @@ allowedUsers = {
     ["rafael_502115"] = true, --5 Dias
     ["Pedrocamandrake391"] = true,
     ["raheeeld"] = true, -- 4 dias
+    ["kaiserfogo9"] = true,
 }
 return allowedUsers
