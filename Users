@@ -1,4 +1,4 @@
-eallowedUsers = {
+allowedUsers = {
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
     ["divamona2"] = true, --staff
