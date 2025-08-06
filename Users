@@ -26,6 +26,6 @@ allowedUsers = {
     ["ANONYMOERROR"] = true,
     ["collinschristine"] = true,
     ["paulo215726"] = true,
-    ["Diegopedrolll] = true
+    ["Diegopedrolll] = true,
 }
 return allowedUsers
