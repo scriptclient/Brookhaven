@@ -36,5 +36,6 @@ allowedUsers = {
     ["Luffy127706"] = true, -- uma semana
     ["lucas02sjsj"] = true, -- um mês 
     ["Revoltzqx"] = true, -- 4 dias
+    ["PEDRINX059"] = true, -- 4 dias
 }
 return allowedUsers
