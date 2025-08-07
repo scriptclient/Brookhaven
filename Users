@@ -38,5 +38,6 @@ allowedUsers = {
     ["Revoltzqx"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
     ["PEDRINX059"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
     ["CUZCUZ12900"] = true,--21 de agosto de 2025 (quinta-feira)
+    ["Kaiser_FOR4"] = true,--3 dias 10 de agosto
 }
 return allowedUsers
