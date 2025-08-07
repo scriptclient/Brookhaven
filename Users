@@ -42,5 +42,6 @@ allowedUsers = {
     ["LOBO_5465"] = true, --3 dias 10 de agosto
     ["pedr9150"] = true,--3 dias 10 de Agosto
     ["Kaiquesla022"] = true,
+    ["cleitinho_adm"] = true,
 }
 return allowedUsers
