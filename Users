@@ -33,8 +33,8 @@ allowedUsers = {
     ["Pedrocamandrake391"] = true, --perm
     ["raheeeld"] = true, -- 4 dias
     ["kaiserfogo9"] = true, -- 4 dias
-    ["Luffy127706"] = true,
-    ["lucas02sjsj"] = true,
-    ["Revoltzqx"] = true,
+    ["Luffy127706"] = true, -- uma semana
+    ["lucas02sjsj"] = true, -- um mês 
+    ["Revoltzqx"] = true, -- 4 dias
 }
 return allowedUsers
