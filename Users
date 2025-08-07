@@ -1,56 +1,67 @@
-allowedUsers = {
+ allowedUsers = {
+    -- 🔓 Acesso padrão
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
- --   ["divamona2"] = true, --staff
-    ["olliver2045judoca"] = true, --staff
-    ["eubatinumavelha"] = true, --staff
-    ["joaozinw11"] = true, --staff
-    ["RECEBA811"] = true, --staff
-    ["murilo_12303"] = true, --staff
-    ["junior568293"] = true, --staff
     ["Lucasgabi96"] = true,
---    ["Carlsinhadaquebrada"] = true,
-    ["hdhfhfxjbx"] = true, ----creator
     ["Kevin202337"] = true,
     ["FLASHFFHD"] = true,
-   -- ["sr_anjo338"] = true, --Sorteio
-    ["gk_skills"] = true, --staff
-    ["is_dragom"] = true,--Sorteio
-    ["Brucho_Caveira"] = true,--Sorteio
     ["Lacrado_ff"] = true,
     ["y_rickyt"] = true,
     ["ProtegendoAmoraCity2"] = true,
     ["sandro131421"] = true,
-    ["gravygrumw"] = true, --staff
- --   ["ANONYMOERROR"] = true, -- 1 mês
-    ["collinschristine"] = true,-- 3 dias/9 de agosto
-    ["paulo215726"] = true, --5 dias/11 de agosto
-    ["Diegopedrolll"] = true,--5dias 11Agst
-    ["llenado123456"] = true,--permanente
-    ["dede6luiz"] = true, --dias
-    ["smulem_01"] = true, --Permanente
-    ["rafael_502115"] = true, --5 Dias 12 de agosto de 2025 (terça-feira)
-    ["Pedrocamandrake391"] = true, --perm
-    ["raheeeld"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
-    ["kaiserfogo9"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
-    ["Luffy127706"] = true, -- uma semana
-    ["lucas02sjsj"] = true, -- um mês 
-    ["Revoltzqx"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
-    ["PEDRINX059"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
-    ["CUZCUZ12900"] = true,--21 de agosto de 2025 (quinta-feira)
-    ["Kaiser_FOR4"] = true,--3 dias 10 de agosto
-    ["LOBO_5465"] = true, --3 dias 10 de agosto
-    ["pedr9150"] = true,--3 dias 10 de Agosto
-    ["Kaiquesla022"] = true, -- 3 dias 10 agosto
-    ["cleitinho_adm"] = true, -- 1 mês
-    ["revoltzqx"] = true,-- 4 dias
-    ["Black444_opHI"] = true, -- 4 dias 11 Agosto
-    ["KIRA7KILLAS"] = true, --permanent
-    ["nikz68"] = true,-- 3 dias
-    ["ASGANRIEL444"] = true, --3 dias
-    ["jadson838383"] = true, --3 dias
-    ["daviricardo25022"] = true, --permanente
-    ["ueiebjj"] = true, -- 3 dias
+
+    -- 🛠️ Staff
+    ["olliver2045judoca"] = true,
+    ["eubatinumavelha"] = true,
+    ["joaozinw11"] = true,
+    ["RECEBA811"] = true,
+    ["murilo_12303"] = true,
+    ["junior568293"] = true,
+    ["gk_skills"] = true,
+    ["gravygrumw"] = true,
+
+    -- 🎁 Sorteio
+    ["is_dragom"] = true,
+    ["Brucho_Caveira"] = true,
+
+    -- 👑 Criador
+    ["hdhfhfxjbx"] = true,
+
+    -- 📅 Acesso temporário
+    ["collinschristine"] = true,     -- 3 dias (até 9 de agosto)
+    ["paulo215726"] = true,          -- 5 dias (até 11 de agosto)
+    ["Diegopedrolll"] = true,        -- 5 dias (até 11 de agosto)
+    ["dede6luiz"] = true,            -- dias não especificados
+    ["rafael_502115"] = true,        -- 5 dias (até 12 de agosto)
+    ["raheeeld"] = true,             -- 4 dias (até 11 de agosto)
+    ["kaiserfogo9"] = true,          -- 4 dias (até 11 de agosto)
+    ["Revoltzqx"] = true,            -- 4 dias (até 11 de agosto)
+    ["PEDRINX059"] = true,           -- 4 dias (até 11 de agosto)
+    ["Kaiser_FOR4"] = true,          -- 3 dias (até 10 de agosto)
+    ["LOBO_5465"] = true,            -- 3 dias (até 10 de agosto)
+    ["pedr9150"] = true,             -- 3 dias (até 10 de agosto)
+    ["Kaiquesla022"] = true,         -- 3 dias (até 10 de agosto)
+    ["Black444_opHI"] = true,        -- 4 dias (até 11 de agosto)
+    ["nikz68"] = true,               -- 3 dias
+    ["ASGANRIEL444"] = true,         -- 3 dias
+    ["jadson838383"] = true,         -- 3 dias
+    ["ueiebjj"] = true,              -- 3 dias
     ["powreingimaginationk"] = true, -- 3 dias
+    ["CUZCUZ12900"] = true,          -- até 21 de agosto
+
+    -- 🕒 Acesso estendido
+    ["lucas02sjsj"] = true,          -- 1 mês
+    ["cleitinho_adm"] = true,        -- 1 mês
+
+    -- ✅ Permanente
+    ["llenado123456"] = true,
+    ["smulem_01"] = true,
+    ["Pedrocamandrake391"] = true,
+    ["KIRA7KILLAS"] = true,
+    ["daviricardo25022"] = true,
+
+    -- 🔁 Duplicatas mantidas por segurança
+    ["revoltzqx"] = true,
 }
+
 return allowedUsers
