@@ -29,14 +29,14 @@ allowedUsers = {
     ["llenado123456"] = true,--permanente
     ["dede6luiz"] = true, --dias
     ["smulem_01"] = true, --Permanente
-    ["rafael_502115"] = true, --5 Dias
+    ["rafael_502115"] = true, --5 Dias 12 de agosto de 2025 (terça-feira)
     ["Pedrocamandrake391"] = true, --perm
-    ["raheeeld"] = true, -- 4 dias
-    ["kaiserfogo9"] = true, -- 4 dias
+    ["raheeeld"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
+    ["kaiserfogo9"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
     ["Luffy127706"] = true, -- uma semana
     ["lucas02sjsj"] = true, -- um mês 
-    ["Revoltzqx"] = true, -- 4 dias
-    ["PEDRINX059"] = true, -- 4 dias
-    ["CUZCUZ12900"] = true,--4 de setembro de 2025 (quinta-feira)
+    ["Revoltzqx"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
+    ["PEDRINX059"] = true, -- 4 dias 11 de agosto de 2025 (segunda-feira)
+    ["CUZCUZ12900"] = true,--21 de agosto de 2025 (quinta-feira)
 }
 return allowedUsers
