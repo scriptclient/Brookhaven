@@ -40,6 +40,7 @@ allowedUsers = {
     ["CUZCUZ12900"] = true,--21 de agosto de 2025 (quinta-feira)
     ["Kaiser_FOR4"] = true,--3 dias 10 de agosto
     ["LOBO_5465"] = true, --3 dias 10 de agosto
-    ["pedr9150"] = true,
+    ["pedr9150"] = true,--3 dias 10 de Agosto
+    ["Kaiquesla022"] = true,
 }
 return allowedUsers
