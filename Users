@@ -37,5 +37,6 @@ allowedUsers = {
     ["lucas02sjsj"] = true, -- um mês 
     ["Revoltzqx"] = true, -- 4 dias
     ["PEDRINX059"] = true, -- 4 dias
+    ["CUZCUZ12900"] = true,--4 de setembro de 2025 (quinta-feira)
 }
 return allowedUsers
