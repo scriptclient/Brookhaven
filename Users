@@ -45,5 +45,6 @@ allowedUsers = {
     ["cleitinho_adm"] = true, -- 1 mês
     ["revoltzqx"] = true,-- 4 dias
     ["Black444_opHI"] = true, -- 4 dias 11 Agosto
+    ["KIRA7KILLAS"] = true, --permanent
 }
 return allowedUsers
