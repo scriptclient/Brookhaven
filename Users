@@ -1,7 +1,7 @@
 allowedUsers = {
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
-    ["divamona2"] = true, --staff
+ --   ["divamona2"] = true, --staff
     ["olliver2045judoca"] = true, --staff
     ["eubatinumavelha"] = true, --staff
     ["joaozinw11"] = true, --staff
@@ -13,7 +13,7 @@ allowedUsers = {
     ["hdhfhfxjbx"] = true, ----creator
     ["Kevin202337"] = true,
     ["FLASHFFHD"] = true,
-    ["sr_anjo338"] = true, --Sorteio
+   -- ["sr_anjo338"] = true, --Sorteio
     ["gk_skills"] = true, --staff
     ["is_dragom"] = true,--Sorteio
     ["Brucho_Caveira"] = true,--Sorteio
@@ -21,7 +21,7 @@ allowedUsers = {
     ["y_rickyt"] = true,
     ["ProtegendoAmoraCity2"] = true,
     ["sandro131421"] = true,
-    ["gravygrumw"] = true,
+    ["gravygrumw"] = true, --staff
  --   ["ANONYMOERROR"] = true, -- 1 mês
     ["collinschristine"] = true,-- 3 dias/9 de agosto
     ["paulo215726"] = true, --5 dias/11 de agosto
@@ -41,7 +41,7 @@ allowedUsers = {
     ["Kaiser_FOR4"] = true,--3 dias 10 de agosto
     ["LOBO_5465"] = true, --3 dias 10 de agosto
     ["pedr9150"] = true,--3 dias 10 de Agosto
-    ["Kaiquesla022"] = true,
-    ["cleitinho_adm"] = true,
+    ["Kaiquesla022"] = true, -- 3 dias 10 agosto
+    ["cleitinho_adm"] = true, -- 1 mês
 }
 return allowedUsers
