@@ -44,5 +44,6 @@ allowedUsers = {
     ["Kaiquesla022"] = true, -- 3 dias 10 agosto
     ["cleitinho_adm"] = true, -- 1 mês
     ["revoltzqx"] = true
+    ["Black444_opHI"] = true, -- 4 dias 11 Agosto
 }
 return allowedUsers
