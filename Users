@@ -35,7 +35,7 @@
     ["rafael_502115"] = true,        -- 5 dias (até 12 de agosto)
     ["raheeeld"] = true,             -- 4 dias (até 11 de agosto)
     ["kaiserfogo9"] = true,          -- 4 dias (até 11 de agosto)
-    ["Revoltzqx"] = true,            -- 4 dias (até 11 de agosto)
+    ["revoltzqx"] = true,            -- 4 dias (até 11 de agosto)
     ["PEDRINX059"] = true,           -- 4 dias (até 11 de agosto)
     ["Kaiser_FOR4"] = true,          -- 3 dias (até 10 de agosto)
     ["LOBO_5465"] = true,            -- 3 dias (até 10 de agosto)
@@ -48,6 +48,7 @@
     ["ueiebjj"] = true,              -- 3 dias
     ["powreingimaginationk"] = true, -- 3 dias
     ["CUZCUZ12900"] = true,          -- até 21 de agosto
+    ["scripter_tubrs938"] = true,
 
     -- 🕒 Acesso estendido
     ["lucas02sjsj"] = true,          -- 1 mês
@@ -59,9 +60,6 @@
     ["Pedrocamandrake391"] = true,
     ["KIRA7KILLAS"] = true,
     ["daviricardo25022"] = true,
-
-    -- 🔁 Duplicatas mantidas por segurança
-    ["revoltzqx"] = true,
 }
 
 return allowedUsers
