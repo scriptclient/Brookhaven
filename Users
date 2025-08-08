@@ -55,12 +55,13 @@
     ["jjkoid6353"] = true, -- 3 dias
     ["Guilherme31467"] = true,--3 dias
     ["panderercc"] = true,--uma semana
-    ["FXroteiro"] = true,
+  --  ["FXroteiro"] = true,
 
     -- 🕒 Acesso estendido
     ["lucas02sjsj"] = true,          -- 1 mês
     ["cleitinho_adm"] = true,        -- 1 mês
     ["Aloysioerick"] = true,         --2 mês
+    ["Carlsinhadaquebrada"] = true,-- semana
 
 -- ✅ Permanente
     ["llenado123456"] = true,
