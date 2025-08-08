@@ -73,7 +73,7 @@
     ["daviricardo25022"] = true,
     ["Salazar123xxx2"] = true,
     ["errorpro1d"] = true,
-    ["AOEX_FH"]
+    ["AOEX_FH"] = true,
 }
 
 return allowedUsers
