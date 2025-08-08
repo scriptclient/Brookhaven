@@ -57,6 +57,7 @@
     ["panderercc"] = true,--uma semana
     ["HAYYBROOKHAVEN"] = true,-- 3 DIAS
    ["NicolasRicow"] = true, -- 3 dias
+   
 
     -- 🕒 Acesso estendido
     ["lucas02sjsj"] = true,          -- 1 mês
@@ -72,6 +73,7 @@
     ["daviricardo25022"] = true,
     ["Salazar123xxx2"] = true,
     ["errorpro1d"] = true,
+    ["AOEX_FH"]
 }
 
 return allowedUsers
