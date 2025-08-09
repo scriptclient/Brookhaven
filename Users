@@ -76,6 +76,7 @@
     ["Salazar123xxx2"] = true,
     ["errorpro1d"] = true,
     ["AOEX_FH"] = true,
+    ["contasegudariadesv"] = true,
 }
 
 return allowedUsers
