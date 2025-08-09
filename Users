@@ -82,6 +82,7 @@
     ["AOEX_FH"] = true,
     ["contasegudariadesv"] = true,
     ["zoro_fenix42"] = true,
+    ["nikz68"] = true,
 }
 
 return allowedUsers
