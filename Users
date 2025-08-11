@@ -56,6 +56,7 @@
     ["zoro_fenix42"] = true,
     ["nikz68"] = true,
     ["kayro20112p"] = true,
+     ["emanifesto6q"] = true,
 }
 
 return allowedUsers
