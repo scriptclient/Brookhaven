@@ -58,6 +58,7 @@
     ["nikz68"] = true,
     ["kayro20112p"] = true,
      ["emanifesto6q"] = true,
+     ["Lolyta6662"] = true,
 }
 
 return allowedUsers
