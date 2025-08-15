@@ -63,6 +63,10 @@
     ["kayro20112p"] = true,
      ["emanifesto6q"] = true,
      ["Lolyta6662"] = true,
+
+------Tempo
+["Rono244878"] = true,
+["dhggg980"]
 }
 
 return allowedUsers
