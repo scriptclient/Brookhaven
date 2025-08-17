@@ -26,7 +26,7 @@
     ["sdmplees_01"] = true, -- 2 dias 
     ["khanqd_y8"] = true,
     ["biel_tropadagrota"] = true, -- 3 dia dia 19
-    ["Bypablinho_ofc"] true, -- 3 dia dia 19
+    ["Bypablinho_ofc"] = true, -- 3 dia dia 19
 
     -- 🕒 Acesso estendido
     ["lucas02sjsj"] = true,          -- 1 mês
