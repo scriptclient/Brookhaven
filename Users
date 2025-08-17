@@ -10,7 +10,7 @@ allowedUsers = {
     ["eubatinumavelha"] = true,
 
     -- 🎁 Sorteio (2 dias)
-    -- [adicione aqui quando necessário]
+    ["Notps1H"]                 = true, 
 
     -- 👑 Criador
     ["hdhfhfxjbx"] = true,
