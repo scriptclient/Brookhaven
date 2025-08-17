@@ -27,6 +27,7 @@ allowedUsers = {
     ["biel_tropadagrota"]= true, -- 3 dias (até 19 agosto)
     ["bypablinho_ofc"]   = true, -- 3 dias (até 19 agosto)
     ["renanqkkd35"]      = true, -- 4 dias (ate 21 Agosto)
+    ["Go_p100"]          = true, -- 3 fias (até 20 agosto)
 
     -- 🕒 Acesso estendido
     ["lucas02sjsj"]        = true, -- 1 mês
