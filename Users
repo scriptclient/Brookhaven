@@ -35,6 +35,7 @@ allowedUsers = {
     ["Miguel_kiwi777"]     = true, -- 2 meses 
     ["MolChops2013"]       = true,
     ["lindobrs1"]          = true,
+    ["Joao96874"]          = true, -- 1 semana
 
     -- ✅ Permanente
     ["llenado123456"]     = true,
