@@ -1,61 +1,57 @@
- allowedUsers = {
+allowedUsers = {
     -- 🔓 Acesso padrão
     ["magnusfxp"] = true,
     ["scout7ixs"] = true,
 
-
-
     -- 🛠️ Staff
-   ["joaozinw11"] = true,
-   ["THEKINGDARKSIDER"] = true,
-   ["sr_anjo338"] = true,
-   ["eubatinumavelha"] = true,
+    ["joaozinw11"] = true,
+    ["THEKINGDARKSIDER"] = true,
+    ["sr_anjo338"] = true,
+    ["eubatinumavelha"] = true,
 
-    -- 🎁 Sorteio -- 2 dias
+    -- 🎁 Sorteio (2 dias)
+    -- [adicione aqui quando necessário]
 
     -- 👑 Criador
     ["hdhfhfxjbx"] = true,
 
     -- 📅 Acesso temporário
-    ["CUZCUZ12900"] = true,          -- até 21 de agosto
-    ["panderercc"] = true,--uma semana
-    ["paulo215726"] = true,-- 17 agosto
-    ["tuntunsahur_891"] = true, -- 3 dias dia 16 agosto 
-    ["tui1392"] = true, -- uma semana
-    ["graknniu"] = true, -- 3 dias dia 17
-    ["sdmplees_01"] = true, -- 2 dias 
-    ["khanqd_y8"] = true,
-    ["biel_tropadagrota"] = true, -- 3 dia dia 19
-    ["bypablinho_ofc"] = true, -- 3 dia dia 19
+    ["CUZCUZ12900"]      = true, -- até 21 de agosto
+    ["panderercc"]       = true, -- 1 semana
+    ["paulo215726"]      = true, -- até 17 agosto
+    ["tuntunsahur_891"]  = true, -- 3 dias (até 16 agosto)
+    ["tui1392"]          = true, -- 1 semana
+    ["graknniu"]         = true, -- 3 dias (até 17 agosto)
+    ["sdmplees_01"]      = true, -- 2 dias
+    ["khanqd_y8"]        = true,
+    ["biel_tropadagrota"]= true, -- 3 dias (até 19 agosto)
+    ["bypablinho_ofc"]   = true, -- 3 dias (até 19 agosto)
 
     -- 🕒 Acesso estendido
-    ["lucas02sjsj"] = true,          -- 1 mês
-    ["cleitinho_adm"] = true,        -- 1 mês
-    ["Aloysioerick"] = true,         --2 mês
-    ["carlsinhadaquebrada"] = true,-- semana
-    ["Miguel_kiwi777"] = true, --2 mês 
-    ["MolChops2013"] = true,
-    ["lindobrs1"] = true,
+    ["lucas02sjsj"]        = true, -- 1 mês
+    ["cleitinho_adm"]      = true, -- 1 mês
+    ["Aloysioerick"]       = true, -- 2 meses
+    ["carlsinhadaquebrada"]= true, -- 1 semana
+    ["Miguel_kiwi777"]     = true, -- 2 meses 
+    ["MolChops2013"]       = true,
+    ["lindobrs1"]          = true,
 
--- ✅ Permanente
-    ["llenado123456"] = true,
-    ["smulem_01"] = true,
-    ["Pedrocamandrake391"] = true,
-    ["KIRA7KILLAS"] = true,
-    ["daviricardo25022"] = true,
-    ["Salazar123xxx2"] = true,
-    ["errorpro1d"] = true,
-    ["AOEX_FH"] = true,
-    ["contasegudariadesv"] = true,
-    ["zoro_fenix42"] = true,
-    ["nikz68"] = true,
-    ["kayro20112p"] = true,
-    ["emanifesto6q"] = true,
-    ["Lolyta6662"] = true,
-    ["Migxzz15"] = true,
-
-------Tempo
-["dhggg980"] = true,
+    -- ✅ Permanente
+    ["llenado123456"]     = true,
+    ["smulem_01"]         = true,
+    ["Pedrocamandrake391"]= true,
+    ["KIRA7KILLAS"]       = true,
+    ["daviricardo25022"]  = true,
+    ["Salazar123xxx2"]    = true,
+    ["errorpro1d"]        = true,
+    ["AOEX_FH"]           = true,
+    ["contasegudariadesv"]= true,
+    ["zoro_fenix42"]      = true,
+    ["nikz68"]            = true,
+    ["kayro20112p"]       = true,
+    ["emanifesto6q"]      = true,
+    ["Lolyta6662"]        = true,
+    ["Migxzz15"]          = true,
 }
 
 return allowedUsers
